@@ -5,15 +5,36 @@ soundBtn = document.querySelector(".sound")
 copyBtn = document.querySelector(".copy")
 twitterBtn = document.querySelector(".twitter")
 
-function randomQuote(){
-    quoteBtn.innerHTML ="Loading Quote..."
-    fetch("http://api.quotable.io/random?timestamp=${new Date().getTime()}").then(res => res.json()).then(result => {
+let quotes = [];
+let lastQuoteIndex = -1;
 
-        quoteText.innerHTML = result.content;
-        authorName.innerText = result.author;
-        quoteBtn.innerHTML ="New Quote"
+// Fetch quotes from  JSON file
+fetch('quotes.json')
+  .then(response => response.json())
+  .then(data => {
+    quotes = data;
+  })
+  .catch(error => {
+    console.error('Error fetching quotes:', error);
+  });
 
-    });
+// Function to display a random quote
+function randomQuote() {
+    if (quotes.length === 0) return; // Do nothing if there are no quotes
+    quoteBtn.innerHTML = "Loading Quote...";
+    let newIndex;
+  
+    // Get a random index that is different from the last one
+    do {
+      newIndex = Math.floor(Math.random() * quotes.length);
+    } while (newIndex === lastQuoteIndex);
+  
+    lastQuoteIndex = newIndex;
+    const quote = quotes[newIndex]; // Get the quote at the new index
+
+    quoteText.innerHTML = quote.quote;
+    authorName.innerText = quote.author;
+    quoteBtn.innerHTML = "New Quote";
 }
 function readQuote(){
         let utterance = new SpeechSynthesisUtterance(`${quoteText.innerText} by ${authorName.innerText}`);
